@@ -545,13 +545,57 @@ function evaluateHousingEligibility(regionEval) {
       }
     }
 
-    // 6. 지역 순위 요건 검사 (서울 전용 등)
-    if (type.id === "seoul-youth-safe" || type.id === "longterm-jeonse") {
-      if (state.targetSido !== "서울특별시") {
+    // 6. 기관별 정밀 거주 요건 검사 (SH, GH, LH 특화 규정)
+    if (type.id === "longterm-jeonse") {
+      // SH 장기전세(Shift)는 공고일 현재 '서울특별시 주민등록 거주자'만 신청 가능 (직장이 서울이어도 불가)
+      if (state.targetSido === "서울특별시") {
+        if (state.userSido !== "서울특별시") {
+          isEligible = false;
+          reasons.push("SH 장기전세 거주요건 미충족: 공고일 현재 '서울특별시 주민등록 등재 거주자'만 신청 가능합니다. (직장·학교만 서울인 경우 신청 불가)");
+        } else {
+          reasons.push("서울시 주민등록 거주자 요건 충족 (SH 장기전세 신청 가능)");
+        }
+      } else {
         isEligible = false;
-        reasons.push("서울특별시 관내에서만 공급되는 전용 주택입니다.");
+        reasons.push("장기전세(Shift)는 서울특별시 관내 공급 전용 주택입니다.");
       }
     }
+
+    if (type.id === "seoul-youth-safe") {
+      // 서울 청년안심주택: 서울시 거주자 또는 서울 소재 직장(소득활동)·대학교 재학자 필수
+      if (state.targetSido === "서울특별시") {
+        const isSeoulResidentOrWorker = (state.userSido === "서울특별시" || state.workSido === "서울특별시");
+        if (!isSeoulResidentOrWorker) {
+          isEligible = false;
+          reasons.push("서울 청년안심주택 요건 미충족: 서울시 거주자 또는 서울 소재 직장·대학 재직(재학)자만 신청 가능합니다.");
+        } else {
+          reasons.push("서울시 거주 또는 직장·학교 연계 요건 충족");
+        }
+      } else {
+        isEligible = false;
+        reasons.push("청년안심주택은 서울특별시 관내 역세권 공급 전용 주택입니다.");
+      }
+    }
+
+    if (type.id === "happy-housing") {
+      if (state.targetSido === "서울특별시") {
+        const hasSeoulConnection = (state.userSido === "서울특별시" || state.workSido === "서울특별시");
+        if (!hasSeoulConnection) {
+          isWarning = true;
+          reasons.push("서울 행복주택 순위 주의: 서울 거주자 및 서울 소재 직장인에게 1순위가 우선 배정되어 타지역 거주자는 사실상 당첨이 어렵습니다.");
+        }
+      }
+    }
+
+    if (type.id === "national-rental") {
+      if (state.targetSido === "서울특별시") {
+        if (state.userSido !== "서울특별시") {
+          isWarning = true;
+          reasons.push("SH 서울 국민임대는 서울시 거주자 한정이며, LH 국민임대 역시 해당 자치구 거주자에게 1순위가 부여됩니다.");
+        }
+      }
+    }
+
 
     return {
       ...type,
