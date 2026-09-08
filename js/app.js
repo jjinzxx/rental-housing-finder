@@ -842,15 +842,19 @@ function renderMatchingAnnouncements(regionEval) {
         <h5 class="font-bold text-slate-900 text-base sm:text-lg">${anc.title}</h5>
         <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
           <span>📍 <strong>${anc.sido} ${anc.gugun}</strong></span>
-          <span>📅 <strong>접수기간:</strong> ${anc.period}</span>
-          <span>🏢 ${anc.scale}</span>
-          <span>💰 <strong>조건:</strong> ${anc.deposit} / ${anc.monthlyRent}</span>
+          <span>📅 <strong>진행 상태:</strong> ${anc.period}</span>
+          <span>🏢 <strong>대상:</strong> ${anc.scale}</span>
         </div>
+        ${anc.guideTip ? `
+        <div class="mt-2 text-xs bg-blue-50/70 p-2.5 rounded-xl border border-blue-100 text-blue-900 leading-relaxed">
+          <strong>💡 공고문 확인 팁:</strong> ${anc.guideTip}
+        </div>
+        ` : ''}
       </div>
       <div class="shrink-0 flex items-center gap-2">
         <a href="${anc.link}" target="_blank" rel="noopener noreferrer" 
            class="w-full md:w-auto text-center px-4 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition shadow-sm inline-flex items-center justify-center gap-1.5">
-          <span>신청 공고문 확인</span>
+          <span>${anc.actionText || '공식 공고 게시판 바로가기'}</span>
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
         </a>
       </div>
