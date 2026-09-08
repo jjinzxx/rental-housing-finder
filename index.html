@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대한민국 임대주택 스마트 파인더 | 오늘 날짜 기준 신청 가능 공고</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Noto Sans KR 폰트 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased">
+
+  <!-- 🌟 [최상단 오늘 날짜 표시 고정 배너] (사용자 요청 100% 반영) -->
+  <aside aria-label="실시간 기준일자 안내" class="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white py-2.5 px-4 shadow-sm border-b border-indigo-700/50">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm">
+      <div class="flex items-center gap-2.5">
+        <span class="inline-flex items-center gap-1.5 bg-emerald-500 text-white font-black text-[11px] px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+          <span class="w-2 h-2 rounded-full bg-white"></span>
+          LIVE
+        </span>
+        <span class="font-bold text-slate-200">
+          📅 오늘 날짜: 
+          <span id="header-today-date" class="text-amber-300 font-extrabold text-sm sm:text-base ml-1">2026년 9월 8일 (화요일)</span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2 text-blue-200 text-xs">
+        <span class="bg-blue-800/80 px-2.5 py-1 rounded-full border border-blue-600/40 text-blue-100 font-semibold flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          오늘 기준 신청 가능한 곳만 자동 선별 중
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 메인 헤더 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-xl shadow-sm">
+          집
+        </div>
+        <div>
+          <h1 class="font-black text-slate-900 text-base sm:text-lg leading-tight">대한민국 임대주택 스마트 파인더</h1>
+          <p class="text-[11px] text-slate-500">거주지·직장 기반 1·2순위 판정 & 최신 신청 가능 공고</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="#official-platforms-section" class="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3.5 py-2 rounded-xl border border-blue-200 transition shadow-xs">
+          공식 사이트 바로가기
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 컨테이너 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <!-- 인트로 히어로 카드 -->
+    <section class="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden">
+      <div class="relative z-10 max-w-3xl space-y-2.5">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/30 border border-blue-400/40 text-xs font-medium">
+          <span>✨ <span id="banner-today-date">2026년 9월 8일</span> 최신 공고 및 자격 기준 반영</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          내 거주지와 직장 위치로<br class="hidden sm:inline"/>
+          오늘 바로 신청 가능한 임대주택을 찾아보세요
+        </h2>
+        <p class="text-blue-100 text-xs sm:text-sm leading-relaxed">
+          거주지와 직장·학교 위치에 따른 <strong>1순위(최우선 공급 대상)</strong>를 실시간 계산하고, <strong>행복주택, 청년안심주택, 국민임대, 장기전세</strong> 등 현재 접수 중인 공고를 안내해 드립니다.
+        </p>
+      </div>
+      <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    </section>
+
+    <!-- 폼 & 실시간 순위 대시보드 (2열 레이아웃) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- 좌측: 조건 선택 폼 -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- [1단계] 지역 및 신청 범위 선택 폼 -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-5">
+          <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100">
+            <span class="w-8 h-8 rounded-xl bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">1</span>
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">지역 및 신청 범위 선택</h3>
+              <p class="text-xs text-slate-500">주민등록 거주지뿐만 아니라 직장·학교 소재지도 1순위 자격이 인정됩니다.</p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <!-- 1-1. 현재 거주지 -->
+            <div>
+              <label for="user-sido" class="block text-xs font-bold text-slate-700 mb-1.5">
+                현재 주민등록 거주지 <span class="text-rose-500">*</span>
+              </label>
+              <div class="grid grid-cols-2 gap-2.5">
+                <select id="user-sido" class="w-full bg-slate-50 hover:bg-slate-100/70 border border-slate-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer"></select>
+                <select id="user-gugun" class="w-full bg-slate-50 hover:bg-slate-100/70 border border-slate-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer"></select>
+              </div>
+            </div>
+
+            <!-- 1-2. 직장 또는 학교 소재지 -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="work-sido" class="block text-xs font-bold text-slate-700">
+                  직장 또는 대학교 소재지 <span class="text-blue-600 font-semibold">(타지역 거주자도 1순위 인정)</span>
+                </label>
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <select id="work-sido" class="w-full bg-slate-50 hover:bg-slate-100/70 border border-slate-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer"></select>
+                <select id="work-gugun" class="w-full bg-slate-50 hover:bg-slate-100/70 border border-slate-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer"></select>
+              </div>
+            </div>
+
+            <!-- 1-3. 청약 신청 희망 지역 -->
+            <div class="bg-blue-50/60 p-4 rounded-2xl border border-blue-200 space-y-2.5">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <label for="target-sido" class="block text-xs font-bold text-blue-900">
+                  🎯 청약 신청 희망 지역 <span class="text-rose-500">*</span>
+                </label>
+                <div class="flex gap-1.5 text-xs">
+                  <button type="button" id="btn-set-target-residence" class="text-xs font-semibold text-blue-700 hover:text-blue-900 bg-white px-2.5 py-1 rounded-lg border border-blue-200 transition shadow-2xs">
+                    거주지와 동일하게
+                  </button>
+                  <button type="button" id="btn-set-target-work" class="text-xs font-semibold text-blue-700 hover:text-blue-900 bg-white px-2.5 py-1 rounded-lg border border-blue-200 transition shadow-2xs">
+                    직장지와 동일하게
+                  </button>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <select id="target-sido" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer"></select>
+                <select id="target-gugun" class="w-full bg-white border border-blue-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer"></select>
+              </div>
+              <p class="text-[11px] text-blue-700 leading-normal">
+                💡 거주지나 직장 위치가 희망 지역과 일치하면 <strong>1순위(최우선 공급)</strong>, 맞닿은 인접 시·군·구는 <strong>2순위(연접 지역)</strong>가 자동 부여됩니다.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- [2단계] 신청자 세부 자격 조건 폼 -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs space-y-5">
+          <div class="flex items-center gap-2.5 pb-4 border-b border-slate-100">
+            <span class="w-8 h-8 rounded-xl bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">2</span>
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">신청자 상세 자격 조건</h3>
+              <p class="text-xs text-slate-500">소득 분위, 가구원수, 자산 요건을 입력하면 적격 여부가 판정됩니다.</p>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <!-- 계층 선택 -->
+            <div>
+              <label for="applicant-category" class="block text-xs font-bold text-slate-700 mb-1.5">
+                신청자 계층 구분 <span class="text-rose-500">*</span>
+              </label>
+              <select id="applicant-category" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer">
+                <option value="youth" selected>청년 (만 19세 ~ 39세, 미혼, 직장인 또는 취업준비생)</option>
+                <option value="student">대학생 (대학교 재학, 복학예정 또는 입학예정자)</option>
+                <option value="newlywed">신혼부부 (혼인 7년 이내 또는 예비신혼부부)</option>
+                <option value="newborn">신생아 출산 가구 (2년 이내 출산/입양, 우선공급 대폭 우대)</option>
+                <option value="senior">고령자 (만 65세 이상 무주택자)</option>
+                <option value="multi-child">다자녀 가구 / 한부모 가족</option>
+                <option value="general">일반 무주택 가구 (연령 무관 무주택세대구성원)</option>
+              </select>
+            </div>
+
+            <!-- 신혼부부 맞벌이 체크박스 -->
+            <div id="dual-income-wrapper" class="hidden p-3 bg-amber-50 rounded-xl border border-amber-200">
+              <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-amber-900">
+                <input type="checkbox" id="is-dual-income" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                <span>맞벌이 부부입니다 (월평균 소득 기준 +20%p 완화 적용)</span>
+              </label>
+            </div>
+
+            <!-- 세대원 수 & 소득 가이드 -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="household-members" class="block text-xs font-bold text-slate-700">
+                  세대원 수 (가구원 수) <span class="text-rose-500">*</span>
+                </label>
+                <span class="text-[11px] text-slate-500">주민등록등본상 등재 세대원</span>
+              </div>
+              <select id="household-members" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer">
+                <option value="1" selected>1인 가구 (단독 세대주 / 본인)</option>
+                <option value="2">2인 가구</option>
+                <option value="3">3인 가구</option>
+                <option value="4">4인 가구</option>
+                <option value="5">5인 이상 가구</option>
+              </select>
+
+              <div id="income-guide-box" class="mt-2.5 p-3 bg-slate-50 rounded-xl border border-slate-200"></div>
+            </div>
+
+            <!-- 월평균 소득 입력 -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="monthly-income-input" class="block text-xs font-bold text-slate-700">
+                  가구원 월평균 합산 소득 (세전) <span class="text-rose-500">*</span>
+                </label>
+                <div class="flex items-center gap-1">
+                  <input type="number" id="monthly-income-input" value="250" min="0" max="1500" step="10"
+                         class="w-24 text-right bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-bold text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <span class="text-xs font-bold text-slate-700">만 원</span>
+                </div>
+              </div>
+              <input type="range" id="monthly-income-slider" min="0" max="1200" step="10" value="250"
+                     class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+              <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+                <span>0원 (무소득)</span>
+                <span>350만 (1인 100%)</span>
+                <span>530만 (2인 100%)</span>
+                <span>720만 (3인 100%)</span>
+                <span>1,200만원+</span>
+              </div>
+            </div>
+
+            <!-- 무주택 & 자산 & 차량 & 통장 요건 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                  주택 소유 여부 <span class="text-rose-500">*</span>
+                </label>
+                <div class="flex gap-2">
+                  <label class="flex-1 flex items-center justify-center gap-1.5 p-2.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 text-xs font-bold">
+                    <input type="radio" name="homeless-status" value="true" checked class="text-blue-600">
+                    <span>무주택자 (세대 전원)</span>
+                  </label>
+                  <label class="flex-1 flex items-center justify-center gap-1.5 p-2.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 text-xs font-bold">
+                    <input type="radio" name="homeless-status" value="false" class="text-blue-600">
+                    <span>유주택자</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label for="car-status" class="block text-xs font-bold text-slate-700 mb-1.5">
+                  자동차 가액 (차량 보유) <span class="text-rose-500">*</span>
+                </label>
+                <select id="car-status" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer">
+                  <option value="none" selected>차량 미보유 (청년 매입임대 최우선)</option>
+                  <option value="under-limit">보유 중 (3,708만 원 이하 충족)</option>
+                  <option value="over-limit">고가 차량 (3,708만 원 초과)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="asset-status" class="block text-xs font-bold text-slate-700 mb-1.5">
+                  총자산 (부동산, 금융 등) <span class="text-rose-500">*</span>
+                </label>
+                <select id="asset-status" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer">
+                  <option value="under-youth" selected>2억 7,300만 원 이하 (청년 기준 충족)</option>
+                  <option value="under-general">3억 4,500만 원 이하 (일반/신혼 충족)</option>
+                  <option value="over-general">3억 4,500만 원 초과</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="subscription-times" class="block text-xs font-bold text-slate-700 mb-1.5">
+                  주택청약종합저축 납입 횟수 <span class="text-rose-500">*</span>
+                </label>
+                <select id="subscription-times" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2.5 text-xs font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-none transition cursor-pointer">
+                  <option value="over-24" selected>24회 이상 납입 (청약 1순위)</option>
+                  <option value="6-23">6회 ~ 23회 납입 (행복주택 등 가능)</option>
+                  <option value="under-6">6회 미만 납입</option>
+                  <option value="none">통장 미보유 (매입임대 등 무관 유형 가능)</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 우측: 실시간 순위 판정 요약 & 공식 링크 퀵패널 -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- 실시간 지역 우선순위 판정 결과 배너 -->
+        <div id="regional-priority-result" class="transition-all"></div>
+
+        <!-- 💡 당첨 확률 높이는 팁 -->
+        <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-xs space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-base">💡</span>
+            <h4 class="font-bold text-slate-900 text-sm">임대주택 당첨 팁</h4>
+          </div>
+          <ul class="space-y-2 text-xs text-slate-600 leading-relaxed">
+            <li class="flex items-start gap-2">
+              <span class="text-blue-600 font-bold">•</span>
+              <span><strong>직장 근처 우선공급:</strong> 거주지가 경기도여도 서울 소재 직장에 재직 중이면 서울 행복주택 1순위 지원이 가능합니다.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-600 font-bold">•</span>
+              <span><strong>청약통장 유지:</strong> 공공임대주택에 당첨되어 입주하더라도 청약통장은 소모되지 않고 일반 아파트 분양 청약 자격이 그대로 유지됩니다.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-600 font-bold">•</span>
+              <span><strong>소득 초과 대안:</strong> 소득 기준을 초과하는 분은 중위소득 150%의 <strong>통합공공임대</strong>나 소득 무관 <strong>공공지원 민간임대</strong>를 추천합니다.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- 공식 포털 퀵 링크 -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-5 text-white shadow-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-sm flex items-center gap-1.5">
+              <span>🏛️</span> 공식 청약 포털 바로가기
+            </h4>
+            <span class="text-[11px] text-slate-400">정부·공공기관</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+            <a href="https://apply.lh.or.kr/" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 p-2.5 rounded-xl border border-slate-700 text-center transition">
+              LH 청약플러스 ↗
+            </a>
+            <a href="https://www.myhome.go.kr/" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 p-2.5 rounded-xl border border-slate-700 text-center transition">
+              마이홈 포털 ↗
+            </a>
+            <a href="https://www.i-sh.co.kr/app/index.do" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 p-2.5 rounded-xl border border-slate-700 text-center transition">
+              SH 서울주택도시 ↗
+            </a>
+            <a href="https://apply.gh.or.kr/" target="_blank" rel="noopener noreferrer" class="bg-slate-800 hover:bg-slate-700 p-2.5 rounded-xl border border-slate-700 text-center transition">
+              GH 경기주택도시 ↗
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- [3단계] 맞춤 진단 결과 (주택 유형별 카드 목록) -->
+    <section class="space-y-4 pt-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-xl bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">3</span>
+            <h3 class="font-bold text-slate-900 text-xl">신청 가능 임대주택 진단 결과</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">입력하신 거주지, 소득, 자산 조건에 부합하는 임대주택 목록입니다.</p>
+        </div>
+
+        <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 self-start sm:self-auto">
+          <button type="button" data-tab="all" class="result-filter-tab px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-600 text-white transition">
+            전체 주택 보기
+          </button>
+          <button type="button" data-tab="eligible" class="result-filter-tab px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+            신청 가능한 주택만 보기 (✓)
+          </button>
+        </div>
+      </div>
+
+      <div id="housing-results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- [4단계] 최신 신청 가능 공고 목록 (사용자 요청: 항상 최신 날짜 기준 신청 가능한 곳만 표시) -->
+    <section class="space-y-4 pt-8 border-t border-slate-200">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">4</span>
+            <div class="flex items-center gap-2">
+              <h3 class="font-bold text-slate-900 text-xl">실시간 신청 가능 공고</h3>
+              <span id="matching-count-badge" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded-full border border-emerald-300"></span>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">
+            오늘 날짜 기준으로 <strong>현재 접수 중(마감 임박)</strong>이거나 <strong>접수 예정</strong>인 공고만 우선 표시합니다.
+          </p>
+        </div>
+
+        <!-- 오늘 기준 신청 가능한 곳만 보기 토글 (항상 기본 활성화) -->
+        <label class="inline-flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100/70 border border-emerald-200 px-3 py-2 rounded-xl cursor-pointer transition">
+          <input type="checkbox" id="filter-only-applyable" checked class="w-4 h-4 text-emerald-600 rounded border-emerald-300 focus:ring-emerald-500">
+          <span class="text-xs font-extrabold text-emerald-900">오늘 기준 신청 가능한 곳만 보기 (마감 제외)</span>
+        </label>
+      </div>
+
+      <div id="matching-announcements-list" class="space-y-3"></div>
+    </section>
+
+    <!-- [5단계] 공식 청약 사이트 전체 목록 (원클릭 접속) -->
+    <section id="official-platforms-section" class="space-y-4 pt-8 border-t border-slate-200">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">5</span>
+          <h3 class="font-bold text-slate-900 text-xl">실제 공고 확인 공식 사이트</h3>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">국토교통부, LH, 지자체 공사가 직접 운영하는 공식 청약 사이트 목록입니다. (원클릭 접속)</p>
+      </div>
+
+      <div id="official-platforms-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- 하단 FAQ -->
+    <section class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-6">
+      <h3 class="font-bold text-slate-900 text-lg sm:text-xl flex items-center gap-2">
+        <span>❓</span> 자주 묻는 질문 (FAQ)
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm">
+        <div class="space-y-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+          <h5 class="font-bold text-slate-900">Q. 주민등록 거주지와 직장 위치가 다른 경우 어디를 기준으로 신청하나요?</h5>
+          <p class="text-slate-600 leading-relaxed">
+            행복주택이나 청년안심주택 등 대부분의 청년형 공공임대는 <strong>주민등록상 주소지 또는 직장(소득활동)·대학교 소재지 중 본인에게 더 유리한 곳</strong>을 기준으로 1순위 신청이 가능합니다.
+          </p>
+        </div>
+        <div class="space-y-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+          <h5 class="font-bold text-slate-900">Q. 임대주택에 당첨되면 청약통장을 날리게 되나요?</h5>
+          <p class="text-slate-600 leading-relaxed">
+            아닙니다! <strong>분양주택(일반 아파트 분양)과 달리 공공임대주택 청약은 당첨되어 입주하더라도 청약통장이 소멸되지 않고 그대로 유지</strong>됩니다. 거주하면서 납입을 계속해 향후 일반 분양 아파트에 다시 지원할 수 있습니다.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="bg-white border-t border-slate-200 mt-12 py-8 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 space-y-2">
+      <p class="font-semibold text-slate-700">대한민국 임대주택 스마트 파인더 (Rental Housing Finder)</p>
+      <p>본 서비스는 국토교통부, 한국토지주택공사(LH), 서울주택도시공사(SH) 등의 공공임대주택 업무처리지침 및 관련 법령을 토대로 제작되었습니다.</p>
+    </div>
+  </footer>
+
+  <!-- 파일 단독 실행 완벽 지원 (경로 및 보안 정책 무관) -->
+  <!-- 단독 실행 완벽 지원 (경로 및 보안 정책 무관) -->
+  <script>
+// 대한민국 행정구역 데이터 및 연접 시군구 매핑
+const KOREA_REGIONS = {
+  "서울특별시": [
+    "강남구", "강동구", "강북구", "강서구", "관악구", "광진구", "구로구", "금천구",
+    "노원구", "도봉구", "동대문구", "동작구", "마포구", "서대문구", "서초구", "성동구",
+    "성북구", "송파구", "양천구", "영등포구", "용산구", "은평구", "종로구", "중구", "중랑구"
+  ],
+  "경기도": [
+    "수원시", "고양시", "용인시", "성남시", "부천시", "화성시", "안산시", "남양주시",
+    "안양시", "평택시", "의정부시", "파주시", "시흥시", "김포시", "광명시", "광주시",
+    "군포시", "이천시", "오산시", "하남시", "양주시", "구리시", "안성시", "포천시",
+    "의왕시", "여주시", "양평군", "동두천시", "과천시", "가평군", "연천군"
+  ],
+  "인천광역시": [
+    "중구", "동구", "미추홀구", "연수구", "남동구", "부평구", "계양구", "서구", "강화군", "옹진군"
+  ],
+  "부산광역시": [
+    "중구", "서구", "동구", "영도구", "부산진구", "동래구", "남구", "북구",
+    "해운대구", "사하구", "금정구", "강서구", "연제구", "수영구", "사상구", "기장군"
+  ],
+  "대구광역시": [
+    "중구", "동구", "서구", "남구", "북구", "수성구", "달서구", "달성군", "군위군"
+  ],
+  "광주광역시": [
+    "동구", "서구", "남구", "북구", "광산구"
+  ],
+  "대전광역시": [
+    "동구", "중구", "서구", "유성구", "대덕구"
+  ],
+  "울산광역시": [
+    "중구", "남구", "동구", "북구", "울주군"
+  ],
+  "세종특별자치시": [
+    "세종시 전역"
+  ],
+  "강원특별자치도": [
+    "춘천시", "원주시", "강릉시", "동해시", "태백시", "속초시", "삼척시", "홍천군",
+    "횡성군", "영월군", "평창군", "정선군", "철원군", "화천군", "양구군", "인제군", "고성군", "양양군"
+  ],
+  "충청북도": [
+    "청주시", "충주시", "제천시", "보은군", "옥천군", "영동군", "증평군", "진천군", "괴산군", "음성군", "단양군"
+  ],
+  "충청남도": [
+    "천안시", "공주시", "보령시", "아산시", "서산시", "논산시", "계룡시", "당진시",
+    "금산군", "부여군", "서천군", "청양군", "홍성군", "예산군", "태안군"
+  ],
+  "전북특별자치도": [
+    "전주시", "군산시", "익산시", "정읍시", "남원시", "김제시", "완주군", "진안군", "무주군", "장수군", "임실군", "순창군", "고창군", "부안군"
+  ],
+  "전라남도": [
+    "목포시", "여수시", "순천시", "나주시", "광양시", "담양군", "곡성군", "구례군", "고흥군", "보성군", "화순군", "장흥군", "강진군", "해남군", "영암군", "무안군", "함평군", "영광군", "장성군", "완도군", "진도군", "신안군"
+  ],
+  "경상북도": [
+    "포항시", "경주시", "김천시", "안동시", "구미시", "영주시", "영천시", "상주시", "문경시", "경산시", "의성군", "청송군", "영양군", "영덕군", "청도군", "고령군", "성주군", "칠곡군", "예천군", "봉화군", "울진군", "울릉군"
+  ],
+  "경상남도": [
+    "창원시", "진주시", "통영시", "사천시", "김해시", "밀양시", "거제시", "양산시", "의령군", "함안군", "창녕군", "고성군", "남해군", "하동군", "산청군", "함양군", "거창군", "합천군"
+  ],
+  "제주특별자치도": [
+    "제주시", "서귀포시"
+  ]
+};
+
+// 서울 주요 자치구와 맞닿아 있는 연접 시·군 매핑 (2순위 판정 로직에 사용)
+const ADJACENT_REGIONS = {
+  "강남구": ["성남시", "과천시"],
+  "서초구": ["과천시", "성남시", "의왕시"],
+  "송파구": ["성남시", "하남시"],
+  "강동구": ["하남시", "구리시", "남양주시"],
+  "광진구": ["구리시"],
+  "중랑구": ["구리시", "남양주시"],
+  "노원구": ["의정부시", "남양주시"],
+  "도봉구": ["의정부시", "양주시"],
+  "강북구": ["양주시"],
+  "은평구": ["고양시"],
+  "마포구": ["고양시"],
+  "강서구": ["김포시", "부천시", "계양구"],
+  "양천구": ["부천시"],
+  "구로구": ["광명시", "부천시"],
+  "금천구": ["안양시", "광명시"],
+  "관악구": ["안양시", "과천시"],
+  "동작구": ["과천시"]
+};
+
+/**
+ * 거주지, 직장/학교 소재지와 희망 공급 지역 간의 청약 순위 판정 함수
+ */
+function evaluateRegionalPriority(userSido, userGugun, workSido, workGugun, targetSido, targetGugun) {
+  if (!userSido || !targetSido) {
+    return {
+      priority: 0,
+      rankText: "지역을 선택해주세요",
+      badgeColor: "bg-slate-100 text-slate-600 border-slate-300",
+      description: "현재 거주지와 희망 지역을 선택하면 신청 가능 순위가 계산됩니다."
+    };
+  }
+
+  // 1. 해당 자치구/시/군 일치 여부 확인 (최우선 1순위)
+  const isDirectResidenceMatch = (userSido === targetSido && (!targetGugun || userGugun === targetGugun));
+  const isDirectWorkMatch = (workSido && workGugun && workSido === targetSido && (!targetGugun || workGugun === targetGugun));
+
+  if (isDirectResidenceMatch || isDirectWorkMatch) {
+    let basis = "";
+    if (isDirectResidenceMatch && isDirectWorkMatch) {
+      basis = "주민등록 거주지 및 직장(학교) 모두 소재";
+    } else if (isDirectResidenceMatch) {
+      basis = "주민등록상 거주지 일치";
+    } else {
+      basis = "직장 또는 학교 소재지 일치";
+    }
+
+    return {
+      priority: 1,
+      rankText: "1순위 (최우선 공급 대상)",
+      badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-300",
+      description: `희망 지역 [${targetSido} ${targetGugun || '전체'}] 관내에 ${basis}하여 최우선 1순위로 신청 가능합니다.`
+    };
+  }
+
+  // 2. 동일 시·도(광역자치단체) 관내 여부 확인
+  const isSameSidoResidence = (userSido === targetSido);
+  const isSameSidoWork = (workSido && workSido === targetSido);
+
+  if (isSameSidoResidence || isSameSidoWork) {
+    if (targetSido === "서울특별시") {
+      return {
+        priority: 1,
+        rankText: "1순위 (서울시 관내 배정)",
+        badgeColor: "bg-teal-100 text-teal-800 border-teal-300",
+        description: `서울시 관내 거주/직장 자격으로 서울시 전체 공고에 1순위 지원이 가능합니다. (해당 자치구 거주자 우선 배점 존재 가능)`
+      };
+    }
+
+    return {
+      priority: 2,
+      rankText: "1~2순위 (동일 시·도 관내)",
+      badgeColor: "bg-blue-100 text-blue-800 border-blue-300",
+      description: `동일한 [${targetSido}] 관내에 거주/직장이 있어, 공급 유형(광역/기초)에 따라 1순위 또는 2순위로 안정적으로 청약 가능합니다.`
+    };
+  }
+
+  // 3. 연접 시·군·구 확인 (서울<->경기 인접 지역 등)
+  let isAdjacent = false;
+  if (targetGugun && ADJACENT_REGIONS[targetGugun]) {
+    if (ADJACENT_REGIONS[targetGugun].includes(userGugun) || (workGugun && ADJACENT_REGIONS[targetGugun].includes(workGugun))) {
+      isAdjacent = true;
+    }
+  }
+  if (userGugun && ADJACENT_REGIONS[userGugun] && ADJACENT_REGIONS[userGugun].includes(targetGugun)) {
+    isAdjacent = true;
+  }
+
+  if (isAdjacent) {
+    return {
+      priority: 2,
+      rankText: "2순위 (연접 시·군·구)",
+      badgeColor: "bg-indigo-100 text-indigo-800 border-indigo-300",
+      description: `희망 지역 [${targetSido} ${targetGugun}]과 현재 거주/직장지가 맞닿아 있는 연접 지역으로 2순위 신청 자격이 부여됩니다.`
+    };
+  }
+
+  // 4. 수도권 상호 지원 (서울/경기/인천 간)
+  const isSudogwon = (sido) => ["서울특별시", "경기도", "인천광역시"].includes(sido);
+  if (isSudogwon(userSido) && isSudogwon(targetSido)) {
+    return {
+      priority: 3,
+      rankText: "2~3순위 (수도권 광역)",
+      badgeColor: "bg-amber-100 text-amber-800 border-amber-300",
+      description: `동일 수도권(서울·경기·인천) 생활권으로, 전국/수도권 통합 일반공급 유형에 청약 가능합니다.`
+    };
+  }
+
+  // 5. 기타 관외 지역
+  return {
+    priority: 4,
+    rankText: "3순위 (기타 관외 지역)",
+    badgeColor: "bg-slate-100 text-slate-700 border-slate-300",
+    description: `해당 지역 외 전국 거주자 자격으로 지원 가능합니다. (전국 대상 행복주택 및 미달·잔여세대 공고 청약 가능)`
+  };
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { KOREA_REGIONS, ADJACENT_REGIONS, evaluateRegionalPriority };
+}
+
+
+
+// 대한민국 공공임대주택 정책 기준 및 소득/자산 가이드라인 (2024~2026 최신 기준)
+
+// 가구원 수별 도시근로자 월평균소득 기준표 (단위: 만원)
+// 1인 가구(+20%p), 2인 가구(+10%p) 법정 완화 기준 반영
+const INCOME_STANDARDS = {
+  1: { 50: 246, 70: 301, 100: 348, 120: 418, 140: 488, 150: 522 },
+  2: { 50: 304, 70: 401, 100: 532, 120: 638, 140: 745, 150: 798 },
+  3: { 50: 360, 70: 503, 100: 719, 120: 863, 140: 1007, 150: 1079 },
+  4: { 50: 412, 70: 577, 100: 824, 120: 989, 140: 1154, 150: 1236 },
+  5: { 50: 439, 70: 614, 100: 877, 120: 1052, 140: 1228, 150: 1316 }
+};
+
+// 차량가액 및 자산 상한 기준 (2024~2026 공통)
+const ASSET_LIMITS = {
+  carValueLimit: 3708, // 만원 (약 3,708만원 이하)
+  youthAssetLimit: 27300, // 만원 (청년 2억 7,300만원 이하)
+  generalAssetLimit: 34500 // 만원 (일반/신혼 3억 4,500만원 이하)
+};
+
+// 임대주택 유형별 상세 데이터 및 자격 판정 룰
+const HOUSING_TYPES = [
+  {
+    id: "happy-housing",
+    name: "행복주택",
+    targetCategory: ["youth", "student", "newlywed", "senior", "vulnerable"],
+    maxIncomeRatio: 100, // 맞벌이 신혼은 120%
+    assetLimitType: "category", // 계층별 상이
+    requireCarCheck: true,
+    requireHomeless: true,
+    requireSubscriptionBank: true, // 청약통장 필요
+    rentRate: "주변 시세의 60% ~ 80%",
+    stayPeriod: "청년 6년(유자녀 10년), 신혼 6~10년, 고령자 20년",
+    features: [
+      "직주근접(대중교통 편리한 도심/역세권) 공급 위주",
+      "빌트인 가구(냉장고, 가스쿡탑, 책상 등) 기본 제공(청년/대학생형)",
+      "보증금 대출 버팀목 전세자금대출 연계 가능"
+    ],
+    officialSites: ["LH 청약플러스", "SH 서울주택도시공사", "GH 경기주택도시공사", "마이홈"],
+    description: "청년·대학생·신혼부부 등 젊은 계층의 주거안정을 위해 직장과 학교가 가까운 곳에 짓는 저렴한 공공임대주택입니다."
+  },
+  {
+    id: "youth-purchase",
+    name: "청년 매입임대 / 기숙사형 주택",
+    targetCategory: ["youth", "student"],
+    maxIncomeRatio: 100,
+    assetLimitType: "youth",
+    requireCarCheck: true, // 차량 미소유 원칙 (생계형 제외)
+    requireHomeless: true,
+    requireSubscriptionBank: false, // 청약통장 무관
+    rentRate: "주변 시세의 40% ~ 50% (매우 저렴)",
+    stayPeriod: "최장 10년 (2년 단위 재계약)",
+    features: [
+      "기존 신축 빌라/오피스텔을 LH/SH가 매입하여 공급",
+      "에어컨, 세탁기, 냉장고 등 풀옵션 빌트인 완비",
+      "청약통장 납입 횟수와 무관하게 소득 및 지역 순위로 선발"
+    ],
+    officialSites: ["LH 청약플러스", "SH 서울주택도시공사", "마이홈"],
+    description: "도심 내 기존 주택을 공공이 매입하여 시세의 40~50% 수준으로 저렴하게 공급하는 풀옵션 청년 원룸·오피스텔형 주택입니다."
+  },
+  {
+    id: "seoul-youth-safe",
+    name: "서울 청년안심주택 (구 역세권 청년주택)",
+    targetCategory: ["youth", "newlywed"],
+    maxIncomeRatio: 120, // 공공 100%, 민간특별 120%, 일반 무관
+    assetLimitType: "youth",
+    requireCarCheck: true, // 차량 미소유(생업용/장애인 제외)
+    requireHomeless: true,
+    requireSubscriptionBank: false,
+    rentRate: "공공임대 시세 30~50%, 민간지원 시세 75~85%",
+    stayPeriod: "최장 8년 ~ 10년",
+    features: [
+      "서울 지하철역 반경 350m 이내 초역세권 입지",
+      "커뮤니티 시설(피트니스, 북카페, 스터디룸, 공유세탁실) 특화",
+      "서울시 임차보증금 무이자 지원 혜택 연계"
+    ],
+    officialSites: ["청년안심주택 종합지원센터", "SH 서울주택도시공사"],
+    description: "서울 역세권에 대중교통이 편리하고 청년 맞춤형 커뮤니티를 갖춘 공공 및 민간 지원 임대주택입니다."
+  },
+  {
+    id: "national-rental",
+    name: "국민임대주택",
+    targetCategory: ["general", "newlywed", "senior", "vulnerable", "multi-child"],
+    maxIncomeRatio: 70, // 월평균소득 70% 이하 (50% 이하 우선공급)
+    assetLimitType: "general",
+    requireCarCheck: true,
+    requireHomeless: true,
+    requireSubscriptionBank: true,
+    rentRate: "주변 시세의 60% ~ 80%",
+    stayPeriod: "최장 30년 (2년 단위 재계약)",
+    features: [
+      "장기적이고 안정적인 주거 보장 (최장 30년)",
+      "전용 29㎡, 36㎡, 46㎡, 51㎡, 59㎡ 등 다양한 중소형 평형",
+      "해당 시·군·구 거주 기간이 길수록 높은 가점 확보"
+    ],
+    officialSites: ["LH 청약플러스", "SH 서울주택도시공사", "GH 경기주택도시공사", "마이홈"],
+    description: "무주택 저소득 서민의 주거 안정을 위해 30년 동안 안정적으로 거주할 수 있는 장기 공공임대주택입니다."
+  },
+  {
+    id: "integrated-public",
+    name: "통합공공임대주택",
+    targetCategory: ["youth", "student", "newlywed", "senior", "general", "multi-child", "vulnerable"],
+    maxIncomeRatio: 150, // 중위소득 150% 이하 폭넓은 입주 허용
+    assetLimitType: "general",
+    requireCarCheck: true,
+    requireHomeless: true,
+    requireSubscriptionBank: true,
+    rentRate: "소득 수준에 따라 시세 35% ~ 90% 슬라이딩 차등 부과",
+    stayPeriod: "청년 6년, 신혼 10년, 다자녀·고령자 30년",
+    features: [
+      "영구임대+국민임대+행복주택을 하나로 통합한 신규 유형",
+      "중위소득 150%까지 자격이 대폭 완화되어 중산층 청년/신혼도 신청 가능",
+      "소득 수준에 맞춘 합리적인 임대료 자동 산출"
+    ],
+    officialSites: ["LH 청약플러스", "마이홈"],
+    description: "행복주택과 국민임대를 통합하여 중위소득 150% 이하까지 폭넓게 입주 기회를 제공하는 차세대 공공임대입니다."
+  },
+  {
+    id: "longterm-jeonse",
+    name: "장기전세주택 (SH 시프트 등)",
+    targetCategory: ["general", "newlywed", "multi-child"],
+    maxIncomeRatio: 150, // 전용면적별 100~150% 이하
+    assetLimitType: "general",
+    requireCarCheck: true,
+    requireHomeless: true,
+    requireSubscriptionBank: true,
+    rentRate: "주변 전세 시세의 80% 이하 (월세 없는 올전세)",
+    stayPeriod: "최장 20년",
+    features: [
+      "매달 나가는 월세 없이 보증금만으로 거주하는 전세형 임대",
+      "중대형 평형(59㎡, 84㎡) 공급이 많아 가족 단위 선호도 최상",
+      "최장 20년 동안 내 집처럼 안정적인 거주 가능"
+    ],
+    officialSites: ["SH 서울주택도시공사", "GH 경기주택도시공사"],
+    description: "월세 부담 없이 주변 전세 시세의 80% 이하로 최장 20년 동안 전세로 살 수 있는 공공 전세주택입니다."
+  },
+  {
+    id: "public-private-rental",
+    name: "공공지원 민간임대주택",
+    targetCategory: ["youth", "newlywed", "general", "senior"],
+    maxIncomeRatio: 999, // 일반공급은 소득 무관
+    assetLimitType: "none",
+    requireCarCheck: false,
+    requireHomeless: true, // 무주택자 기준
+    requireSubscriptionBank: false,
+    rentRate: "일반 시세 95% 이하, 청년/신혼 특별공급 시세 75~85%",
+    stayPeriod: "최장 10년 (2년마다 5% 이내 임대료 증액 제한)",
+    features: [
+      "소득·자산 요건이 까다롭지 않아 소득 기준 초과자에게 최적의 대안",
+      "대형 브랜드 건설사(자이, 래미안, 힐스테이트 등) 아파트 단지 입주",
+      "10년간 이사 걱정 없이 안정적인 거주 보장"
+    ],
+    officialSites: ["청약홈 (한국부동산원)", "마이홈"],
+    description: "민간 건설사가 짓고 공공이 지원하여 소득·자산 기준에 구애받지 않고 최대 10년 거주할 수 있는 브랜드 아파트입니다."
+  }
+];
+
+// 공식 임대주택 확인 및 청약 사이트 메타데이터 (다이렉트 링크 생성용)
+const OFFICIAL_PLATFORMS = [
+  {
+    id: "myhome",
+    name: "마이홈 포털 (국토교통부·LH)",
+    badge: "전국 통합 조회",
+    tagline: "전국 공공임대주택 입주자 자가진단 및 공고 종합 포털",
+    url: "https://www.myhome.go.kr/",
+    noticeUrl: "https://www.myhome.go.kr/hws/portal/sch/selectRsdtRcritNtcView.do",
+    diagnosisUrl: "https://www.myhome.go.kr/hws/portal/dgn/selectSelfDgnInsttView.do",
+    features: "전국 모든 지자체 및 공공기관의 임대주택 공고를 한곳에서 검색하고 맞춤형 자가진단을 제공합니다."
+  },
+  {
+    id: "lh",
+    name: "LH 청약플러스 (한국토지주택공사)",
+    badge: "전국 최대 공급",
+    tagline: "전국 행복주택, 국민임대, 매입임대, 통합공공임대 공식 청약 시스템",
+    url: "https://apply.lh.or.kr/",
+    noticeUrl: "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancList.do",
+    features: "대한민국 최대 공급 기관인 LH의 전국 단위 모든 임대주택 분양·임대 공고문 및 인터넷 청약 신청 창구입니다."
+  },
+  {
+    id: "sh",
+    name: "SH 서울주택도시공사 인터넷청약",
+    badge: "서울 전역 공급",
+    tagline: "서울시 관내 행복주택, 장기전세, 역세권 청년주택, 국민임대",
+    url: "https://www.i-sh.co.kr/app/index.do",
+    noticeUrl: "https://www.i-sh.co.kr/main/lay2/program/S1T294C297/www/brd/m_247/list.do",
+    features: "서울특별시 관내에서 공급되는 SH 공공임대주택, 장기전세(Shift), 매입임대의 단독 청약 센터입니다."
+  },
+  {
+    id: "gh",
+    name: "GH 경기주택도시공사 청약센터",
+    badge: "경기도 전역 공급",
+    tagline: "경기도 관내 행복주택, 국민임대, 기본주택 공고 및 청약",
+    url: "https://apply.gh.or.kr/",
+    noticeUrl: "https://apply.gh.or.kr/co/coa/selectRcritPblancList.do",
+    features: "판교, 광교, 다산, 고양 등 경기도 핵심 개발지구 내 GH 공공임대주택 공급 공고를 전담합니다."
+  },
+  {
+    id: "seoul-youth-housing",
+    name: "서울 청년안심주택 종합지원센터",
+    badge: "서울 초역세권",
+    tagline: "서울 지하철 역세권 350m 이내 청년·신혼 전용 공공/민간 임대",
+    url: "https://soco.seoul.go.kr/youth/main/main.do",
+    noticeUrl: "https://soco.seoul.go.kr/youth/bbs/BMSR00015/list.do?menuNo=400008",
+    features: "서울시 전역 역세권 청년안심주택의 단지별 실시간 입주자 모집 공고와 보증금 무이자 지원을 안내합니다."
+  },
+  {
+    id: "applyhome",
+    name: "청약홈 (한국부동산원)",
+    badge: "공공지원 민간임대",
+    tagline: "소득 요건 완화된 공공지원 민간임대 및 일반 청약",
+    url: "https://www.applyhome.co.kr/",
+    noticeUrl: "https://www.applyhome.co.kr/ai/aia/selectAPTLttotPblancListView.do",
+    features: "소득이나 자산 기준이 높아 공공임대 진입이 어려운 분들을 위한 고품질 공공지원 민간임대 공고를 제공합니다."
+  }
+];
+
+// 기준 날짜를 기반으로 실시간 신청 가능 공고 목록 생성 함수
+function getDynamicAnnouncements(baseDate = new Date()) {
+  const formatDate = (d) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}.${month}.${day}`;
+  };
+
+  const addDays = (d, days) => {
+    const result = new Date(d);
+    result.setDate(result.getDate() + days);
+    return result;
+  };
+
+  const items = [
+    {
+      id: "ANC-001",
+      sido: "서울특별시",
+      gugun: "강남구",
+      title: "2026년 서울 강남 수서 A3블록 역세권 행복주택 입주자 모집",
+      housingType: "행복주택",
+      typeId: "happy-housing",
+      agency: "LH 청약플러스",
+      target: ["youth", "newlywed", "student", "senior"],
+      scale: "총 199세대 (전용 14㎡, 26㎡, 44㎡)",
+      startOffset: -3, // 3일 전 시작
+      endOffset: 5,    // 5일 후 마감
+      deposit: "보증금 4,200만 ~ 1억 1,000만 원",
+      monthlyRent: "월 15만 ~ 38만 원",
+      link: "https://apply.lh.or.kr/"
+    },
+    {
+      id: "ANC-002",
+      sido: "서울특별시",
+      gugun: "마포구",
+      title: "마포 서교동 청년안심주택(역세권) 입주자 모집공고",
+      housingType: "서울 청년안심주택 (구 역세권 청년주택)",
+      typeId: "seoul-youth-safe",
+      agency: "서울 청년안심주택",
+      target: ["youth", "student"],
+      scale: "총 320세대 (풀옵션 빌트인 원룸)",
+      startOffset: -5,
+      endOffset: 3, // D-3 마감 임박
+      deposit: "보증금 3,000만 ~ 6,500만 원 (서울시 무이자 대출)",
+      monthlyRent: "월 18만 ~ 35만 원",
+      link: "https://soco.seoul.go.kr/youth/main/main.do"
+    },
+    {
+      id: "ANC-003",
+      sido: "서울특별시",
+      gugun: "송파구",
+      title: "제1차 송파 위례지구 장기전세주택(Shift) 입주자 모집",
+      housingType: "장기전세주택 (SH 시프트 등)",
+      typeId: "longterm-jeonse",
+      agency: "SH 서울주택도시공사",
+      target: ["newlywed", "general", "multi-child"],
+      scale: "총 150세대 (전용 59㎡, 84㎡ 올전세)",
+      startOffset: -1,
+      endOffset: 8,
+      deposit: "전세보증금 3억 2,000만 ~ 4억 5,000만 원",
+      monthlyRent: "월 0원 (올전세)",
+      link: "https://www.i-sh.co.kr/app/index.do"
+    },
+    {
+      id: "ANC-004",
+      sido: "경기도",
+      gugun: "성남시",
+      title: "성남 판교 제2테크노밸리 청년·창업인 행복주택 모집",
+      housingType: "행복주택",
+      typeId: "happy-housing",
+      agency: "LH 청약플러스",
+      target: ["youth", "student"],
+      scale: "총 200세대 (전용 21㎡, 36㎡)",
+      startOffset: -2,
+      endOffset: 6,
+      deposit: "보증금 3,500만 ~ 6,800만 원",
+      monthlyRent: "월 14만 ~ 26만 원",
+      link: "https://apply.lh.or.kr/"
+    },
+    {
+      id: "ANC-005",
+      sido: "경기도",
+      gugun: "수원시",
+      title: "수원 광교 경기행복주택 잔여세대 입주자 모집공고",
+      housingType: "행복주택",
+      typeId: "happy-housing",
+      agency: "GH 경기주택도시공사",
+      target: ["youth", "newlywed", "senior"],
+      scale: "총 85세대",
+      startOffset: -4,
+      endOffset: 4,
+      deposit: "보증금 4,000만 ~ 7,500만 원",
+      monthlyRent: "월 16만 ~ 30만 원",
+      link: "https://apply.gh.or.kr/"
+    },
+    {
+      id: "ANC-006",
+      sido: "경기도",
+      gugun: "고양시",
+      title: "고양 삼송·지축 국민임대주택 예비입주자 모집",
+      housingType: "국민임대주택",
+      typeId: "national-rental",
+      agency: "LH 청약플러스",
+      target: ["general", "senior", "multi-child"],
+      scale: "총 140세대",
+      startOffset: 2, // 2일 후 시작 (접수예정)
+      endOffset: 12,
+      deposit: "보증금 2,500만 ~ 5,500만 원",
+      monthlyRent: "월 12만 ~ 24만 원",
+      link: "https://apply.lh.or.kr/"
+    },
+    {
+      id: "ANC-007",
+      sido: "인천광역시",
+      gugun: "연수구",
+      title: "인천 송도국제도시 공공지원 민간임대아파트 공급",
+      housingType: "공공지원 민간임대주택",
+      typeId: "public-private-rental",
+      agency: "청약홈 (한국부동산원)",
+      target: ["youth", "newlywed", "general"],
+      scale: "총 800세대 (소득무관 브랜드 대단지)",
+      startOffset: -2,
+      endOffset: 9,
+      deposit: "보증금 1억 5,000만 ~ 2억 2,000만 원",
+      monthlyRent: "월 30만 ~ 45만 원",
+      link: "https://www.applyhome.co.kr/"
+    },
+    {
+      id: "ANC-008",
+      sido: "부산광역시",
+      gugun: "해운대구",
+      title: "부산 센텀시티 청년 매입임대주택 정기모집",
+      housingType: "청년 매입임대 / 기숙사형 주택",
+      typeId: "youth-purchase",
+      agency: "LH 청약플러스",
+      target: ["youth", "student"],
+      scale: "총 120실 (풀옵션 원룸)",
+      startOffset: -6,
+      endOffset: 2, // D-2 마감임박
+      deposit: "보증금 100만 ~ 200만 원",
+      monthlyRent: "월 12만 ~ 22만 원",
+      link: "https://apply.lh.or.kr/"
+    },
+    {
+      id: "ANC-009",
+      sido: "서울특별시",
+      gugun: "동작구",
+      title: "[종료] 서울 상도동 청년주택 입주자 모집 (지난 공고)",
+      housingType: "행복주택",
+      typeId: "happy-housing",
+      agency: "SH 서울주택도시공사",
+      target: ["youth"],
+      scale: "총 80세대",
+      startOffset: -20,
+      endOffset: -5, // 5일 전 마감됨
+      deposit: "보증금 3,000만 원",
+      monthlyRent: "월 20만 원",
+      link: "https://www.i-sh.co.kr/app/index.do"
+    }
+  ];
+
+  return items.map((item) => {
+    const startDate = addDays(baseDate, item.startOffset);
+    const endDate = addDays(baseDate, item.endOffset);
+    const nowTime = baseDate.getTime();
+    const startTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
+    const endTime = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59).getTime();
+
+    let status = "접수중";
+    let statusBadge = "bg-emerald-100 text-emerald-800 border-emerald-300";
+    let isApplyable = true;
+    let dDayText = "";
+
+    if (nowTime < startTime) {
+      status = "접수예정";
+      statusBadge = "bg-amber-100 text-amber-800 border-amber-300";
+      isApplyable = true;
+      const diffDays = Math.ceil((startTime - nowTime) / (1000 * 60 * 60 * 24));
+      dDayText = `D-${diffDays}일 후 접수시작`;
+    } else if (nowTime > endTime) {
+      status = "마감됨";
+      statusBadge = "bg-slate-100 text-slate-500 border-slate-300";
+      isApplyable = false;
+      dDayText = "접수종료";
+    } else {
+      status = "접수중";
+      statusBadge = "bg-emerald-100 text-emerald-800 border-emerald-300";
+      isApplyable = true;
+      const remainDays = Math.ceil((endTime - nowTime) / (1000 * 60 * 60 * 24));
+      dDayText = remainDays <= 3 ? `🔥 D-${remainDays}일 (마감임박)` : `D-${remainDays}일 남음`;
+    }
+
+    return {
+      ...item,
+      period: `${formatDate(startDate)} ~ ${formatDate(endDate)}`,
+      startDateStr: formatDate(startDate),
+      endDateStr: formatDate(endDate),
+      status,
+      statusBadge,
+      isApplyable,
+      dDayText
+    };
+  });
+}
+
+const MOCK_ANNOUNCEMENTS = getDynamicAnnouncements();
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { INCOME_STANDARDS, ASSET_LIMITS, HOUSING_TYPES, OFFICIAL_PLATFORMS, MOCK_ANNOUNCEMENTS };
+}
+
+
+
+// 임대주택 파인더 핵심 애플리케이션 로직
+
+// 전역 상태
+const state = {
+  // 1단계: 지역 정보
+  userSido: "서울특별시",
+  userGugun: "강남구",
+  workSido: "서울특별시",
+  workGugun: "강남구",
+  targetSido: "서울특별시",
+  targetGugun: "강남구",
+
+  // 2단계: 자격 상세 조건
+  category: "youth", // youth, student, newlywed, newborn, senior, general, multi-child
+  householdMembers: 1,
+  monthlyIncome: 250, // 단위: 만원
+  isDualIncome: false,
+  isHomeless: true,
+  carStatus: "none", // none, under-limit, over-limit
+  totalAssetStatus: "under-youth", // under-youth, under-general, over-general
+  bankAccountTimes: "over-24", // none, under-6, 6-23, over-24
+  
+  // 탭 및 날짜 필터 상태
+  currentTab: "all", // all, eligible
+  onlyApplyable: true, // 항상 최신 날짜 기준 신청 가능한 곳만 보기 (기본값 TRUE)
+  baseDate: new Date()
+};
+
+// 각 주택 유형에 대한 진단 결과 보관용 변수 (상단 선언으로 TDZ 에러 방지)
+let calculatedHousingList = [];
+
+
+/**
+ * 안전한 앱 초기화 실행기 (DOM 로딩 상태 완벽 대응)
+ */
+function startApplication() {
+  if (window.__app_initialized) return;
+  window.__app_initialized = true;
+
+  displayCurrentDate();
+  populateSelectOptions();
+  setupEventListeners();
+  updateIncomeStandardDisplay();
+  calculateAndRender();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener("DOMContentLoaded", startApplication);
+} else {
+  startApplication();
+}
+window.addEventListener("load", startApplication);
+
+/**
+ * 최상단 오늘 날짜 표시 함수
+ */
+function displayCurrentDate() {
+  const now = state.baseDate;
+  const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const date = now.getDate();
+  const dayName = days[now.getDay()];
+  const formatted = `${year}년 ${month}월 ${date}일 (${dayName})`;
+
+  const topHeaderEl = document.getElementById("header-today-date");
+  if (topHeaderEl) {
+    topHeaderEl.textContent = formatted;
+  }
+
+  const bannerEl = document.getElementById("banner-today-date");
+  if (bannerEl) {
+    bannerEl.textContent = formatted;
+  }
+}
+
+/**
+ * 시/도 및 구/군 셀렉트 박스 옵션 초기화
+ */
+function populateSelectOptions() {
+  if (typeof KOREA_REGIONS === 'undefined') {
+    console.error("KOREA_REGIONS 데이터가 로드되지 않았습니다.");
+    return;
+  }
+
+  const sidoList = Object.keys(KOREA_REGIONS);
+  const sidoSelects = ["user-sido", "work-sido", "target-sido"];
+
+  sidoSelects.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = "";
+    
+    // 직장/학교는 '선택 안함(해당없음)' 옵션 추가
+    if (id === "work-sido") {
+      const defaultOpt = document.createElement("option");
+      defaultOpt.value = "";
+      defaultOpt.textContent = "선택 안 함 (무직 또는 재택)";
+      el.appendChild(defaultOpt);
+    }
+
+    sidoList.forEach((sido) => {
+      const opt = document.createElement("option");
+      opt.value = sido;
+      opt.textContent = sido;
+      if (sido === "서울특별시") opt.selected = true;
+      el.appendChild(opt);
+    });
+  });
+
+  // 초기 구/군 렌더링
+  updateGugunSelect("user-sido", "user-gugun", state.userSido);
+  updateGugunSelect("work-sido", "work-gugun", state.workSido);
+  updateGugunSelect("target-sido", "target-gugun", state.targetSido);
+}
+
+/**
+ * 특정 시/도 선택에 따른 시/군/구 옵션 갱신
+ */
+function updateGugunSelect(sidoSelectId, gugunSelectId, selectedSido) {
+  const gugunEl = document.getElementById(gugunSelectId);
+  if (!gugunEl) return;
+  gugunEl.innerHTML = "";
+
+  if (!selectedSido) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "시/도를 먼저 선택하세요";
+    gugunEl.appendChild(opt);
+    gugunEl.disabled = true;
+    return;
+  }
+
+  gugunEl.disabled = false;
+  const guguns = (typeof KOREA_REGIONS !== 'undefined' && KOREA_REGIONS[selectedSido]) ? KOREA_REGIONS[selectedSido] : [];
+  
+  // 전체 시군 선택 옵션
+  const allOpt = document.createElement("option");
+  allOpt.value = "";
+  allOpt.textContent = `${selectedSido} 전체`;
+  gugunEl.appendChild(allOpt);
+
+  guguns.forEach((gugun) => {
+    const opt = document.createElement("option");
+    opt.value = gugun;
+    opt.textContent = gugun;
+    if (gugun === "강남구" && selectedSido === "서울특별시") {
+      opt.selected = true;
+    }
+    gugunEl.appendChild(opt);
+  });
+}
+
+/**
+ * 이벤트 리스너 등록
+ */
+function setupEventListeners() {
+  // 지역 선택 변경 이벤트
+  document.getElementById("user-sido")?.addEventListener("change", (e) => {
+    state.userSido = e.target.value;
+    updateGugunSelect("user-sido", "user-gugun", state.userSido);
+    state.userGugun = document.getElementById("user-gugun").value;
+    calculateAndRender();
+  });
+
+  document.getElementById("user-gugun")?.addEventListener("change", (e) => {
+    state.userGugun = e.target.value;
+    calculateAndRender();
+  });
+
+  document.getElementById("work-sido")?.addEventListener("change", (e) => {
+    state.workSido = e.target.value;
+    updateGugunSelect("work-sido", "work-gugun", state.workSido);
+    state.workGugun = document.getElementById("work-gugun").value;
+    calculateAndRender();
+  });
+
+  document.getElementById("work-gugun")?.addEventListener("change", (e) => {
+    state.workGugun = e.target.value;
+    calculateAndRender();
+  });
+
+  document.getElementById("target-sido")?.addEventListener("change", (e) => {
+    state.targetSido = e.target.value;
+    updateGugunSelect("target-sido", "target-gugun", state.targetSido);
+    state.targetGugun = document.getElementById("target-gugun").value;
+    calculateAndRender();
+  });
+
+  document.getElementById("target-gugun")?.addEventListener("change", (e) => {
+    state.targetGugun = e.target.value;
+    calculateAndRender();
+  });
+
+  // 희망지역을 거주지/직장지와 동일하게 빠르게 설정하는 버튼
+  document.getElementById("btn-set-target-residence")?.addEventListener("click", () => {
+    document.getElementById("target-sido").value = state.userSido;
+    state.targetSido = state.userSido;
+    updateGugunSelect("target-sido", "target-gugun", state.targetSido);
+    document.getElementById("target-gugun").value = state.userGugun;
+    state.targetGugun = state.userGugun;
+    calculateAndRender();
+  });
+
+  document.getElementById("btn-set-target-work")?.addEventListener("click", () => {
+    if (!state.workSido) return;
+    document.getElementById("target-sido").value = state.workSido;
+    state.targetSido = state.workSido;
+    updateGugunSelect("target-sido", "target-gugun", state.targetSido);
+    document.getElementById("target-gugun").value = state.workGugun;
+    state.targetGugun = state.workGugun;
+    calculateAndRender();
+  });
+
+  // 신청자 계층 변경
+  document.getElementById("applicant-category")?.addEventListener("change", (e) => {
+    state.category = e.target.value;
+    const dualIncomeWrapper = document.getElementById("dual-income-wrapper");
+    if (state.category === "newlywed" || state.category === "newborn") {
+      dualIncomeWrapper?.classList.remove("hidden");
+    } else {
+      dualIncomeWrapper?.classList.add("hidden");
+      state.isDualIncome = false;
+      const chk = document.getElementById("is-dual-income");
+      if (chk) chk.checked = false;
+    }
+    calculateAndRender();
+  });
+
+  document.getElementById("is-dual-income")?.addEventListener("change", (e) => {
+    state.isDualIncome = e.target.checked;
+    calculateAndRender();
+  });
+
+  // 가구원 수 변경
+  document.getElementById("household-members")?.addEventListener("change", (e) => {
+    state.householdMembers = parseInt(e.target.value, 10);
+    updateIncomeStandardDisplay();
+    calculateAndRender();
+  });
+
+  // 월 소득 슬라이더 및 인풋
+  const incomeSlider = document.getElementById("monthly-income-slider");
+  const incomeInput = document.getElementById("monthly-income-input");
+
+  incomeSlider?.addEventListener("input", (e) => {
+    const val = parseInt(e.target.value, 10);
+    state.monthlyIncome = val;
+    if (incomeInput) incomeInput.value = val;
+    calculateAndRender();
+  });
+
+  incomeInput?.addEventListener("input", (e) => {
+    let val = parseInt(e.target.value, 10);
+    if (isNaN(val) || val < 0) val = 0;
+    if (val > 1500) val = 1500;
+    state.monthlyIncome = val;
+    if (incomeSlider) incomeSlider.value = val;
+    calculateAndRender();
+  });
+
+  // 무주택 여부
+  document.querySelectorAll("input[name='homeless-status']").forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      state.isHomeless = (e.target.value === "true");
+      calculateAndRender();
+    });
+  });
+
+  // 차량 보유 상태
+  document.getElementById("car-status")?.addEventListener("change", (e) => {
+    state.carStatus = e.target.value;
+    calculateAndRender();
+  });
+
+  // 총자산 상태
+  document.getElementById("asset-status")?.addEventListener("change", (e) => {
+    state.totalAssetStatus = e.target.value;
+    calculateAndRender();
+  });
+
+  // 청약통장 납입 횟수
+  document.getElementById("subscription-times")?.addEventListener("change", (e) => {
+    state.bankAccountTimes = e.target.value;
+    calculateAndRender();
+  });
+
+  // 오늘 기준 신청 가능한 곳만 보기 토글 체크박스
+  document.getElementById("filter-only-applyable")?.addEventListener("change", (e) => {
+    state.onlyApplyable = e.target.checked;
+    const regionEval = evaluateRegionalPriority(
+      state.userSido, state.userGugun, state.workSido, state.workGugun, state.targetSido, state.targetGugun
+    );
+    renderMatchingAnnouncements(regionEval);
+  });
+
+  // 결과 필터 탭
+  document.querySelectorAll(".result-filter-tab").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      document.querySelectorAll(".result-filter-tab").forEach(b => {
+        b.classList.remove("bg-blue-600", "text-white");
+        b.classList.add("bg-slate-100", "text-slate-700", "hover:bg-slate-200");
+      });
+      btn.classList.add("bg-blue-600", "text-white");
+      btn.classList.remove("bg-slate-100", "text-slate-700", "hover:bg-slate-200");
+      state.currentTab = btn.dataset.tab;
+      renderHousingCards();
+    });
+  });
+}
+
+/**
+ * 가구원수별 소득 기준 안내 박스 갱신
+ */
+function updateIncomeStandardDisplay() {
+  if (typeof INCOME_STANDARDS === 'undefined') return;
+  const members = Math.min(Math.max(state.householdMembers, 1), 5);
+  const std = INCOME_STANDARDS[members];
+  const box = document.getElementById("income-guide-box");
+  if (!box || !std) return;
+
+  box.innerHTML = `
+    <div class="text-xs font-semibold text-slate-500 mb-1">
+      📊 ${members}인 가구 기준 월평균 소득표 (2024~2026 기준):
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+      <div class="bg-blue-50 border border-blue-100 rounded px-2 py-1">
+        <span class="font-bold text-blue-700">70% 이하:</span> <strong>${std[70]}만 원</strong>
+      </div>
+      <div class="bg-emerald-50 border border-emerald-100 rounded px-2 py-1">
+        <span class="font-bold text-emerald-700">100% 이하:</span> <strong>${std[100]}만 원</strong>
+      </div>
+      <div class="bg-amber-50 border border-amber-100 rounded px-2 py-1">
+        <span class="font-bold text-amber-700">120% 이하:</span> <strong>${std[120]}만 원</strong>
+      </div>
+      <div class="bg-purple-50 border border-purple-100 rounded px-2 py-1">
+        <span class="font-bold text-purple-700">150% 이하:</span> <strong>${std[150]}만 원</strong>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * 종합 계산 및 렌더링
+ */
+function calculateAndRender() {
+  if (typeof evaluateRegionalPriority !== 'function') return;
+
+  // 1. 지역 우선순위 판정
+  const regionEval = evaluateRegionalPriority(
+    state.userSido,
+    state.userGugun,
+    state.workSido,
+    state.workGugun,
+    state.targetSido,
+    state.targetGugun
+  );
+
+  renderRegionSummary(regionEval);
+
+  // 2. 주택 유형별 자격 진단
+  evaluateHousingEligibility(regionEval);
+
+  // 3. 카드 렌더링
+  renderHousingCards();
+
+  // 4. 공식 사이트 바로가기 버튼 업데이트
+  updateOfficialSiteLinks();
+
+  // 5. 최신 날짜 기준 신청 가능 공고 필터링 렌더링
+  renderMatchingAnnouncements(regionEval);
+}
+
+/**
+ * 상단 지역 순위 요약 배너 렌더링
+ */
+function renderRegionSummary(evalResult) {
+  const container = document.getElementById("regional-priority-result");
+  if (!container) return;
+
+  const targetLabel = `${state.targetSido} ${state.targetGugun || '전체'}`;
+
+  container.innerHTML = `
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border ${evalResult.badgeColor} bg-opacity-30">
+      <div class="flex items-start gap-3">
+        <div class="p-2.5 rounded-lg bg-white shadow-sm border border-slate-200">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full ${evalResult.badgeColor} border">
+              ${evalResult.rankText}
+            </span>
+            <h3 class="font-bold text-slate-900 text-base sm:text-lg">
+              신청 희망 지역: <span class="text-blue-700">${targetLabel}</span>
+            </h3>
+          </div>
+          <p class="text-sm text-slate-700 mt-1 leading-relaxed">
+            ${evalResult.description}
+          </p>
+        </div>
+      </div>
+      <div class="text-right sm:self-center shrink-0">
+        <a href="#official-platforms-section" class="inline-flex items-center gap-1.5 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-lg transition shadow-sm">
+          <span>공식 공고 확인</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * 모든 임대주택 유형에 대한 적격성 판정
+ */
+function evaluateHousingEligibility(regionEval) {
+  if (typeof HOUSING_TYPES === 'undefined' || typeof INCOME_STANDARDS === 'undefined') return;
+
+  const members = Math.min(Math.max(state.householdMembers, 1), 5);
+  const std = INCOME_STANDARDS[members];
+
+  calculatedHousingList = HOUSING_TYPES.map((type) => {
+    const reasons = [];
+    let isEligible = true;
+    let isWarning = false;
+
+    // 1. 무주택 요건 검사
+    if (type.requireHomeless && !state.isHomeless) {
+      isEligible = false;
+      reasons.push("무주택세대구성원 요건 미충족 (유주택자 신청 불가)");
+    }
+
+    // 2. 신청 계층 검사
+    if (!type.targetCategory.includes(state.category)) {
+      isEligible = false;
+      const catNames = {
+        youth: "청년", student: "대학생", newlywed: "신혼부부", 
+        newborn: "신생아가구", senior: "고령자", general: "일반가구",
+        "multi-child": "다자녀가구", vulnerable: "취약계층"
+      };
+      const validNames = type.targetCategory.map(c => catNames[c] || c).join(", ");
+      reasons.push(`현재 선택하신 계층(${catNames[state.category]}) 대상이 아닙니다. (대상: ${validNames})`);
+    }
+
+    // 3. 소득 요건 검사
+    let maxRatio = type.maxIncomeRatio;
+    if ((state.category === "newlywed" || state.category === "newborn") && state.isDualIncome) {
+      maxRatio += 20;
+    }
+
+    if (maxRatio < 900) {
+      const maxAllowedIncome = std[maxRatio] || Math.round((std[100] * maxRatio) / 100);
+      if (state.monthlyIncome > maxAllowedIncome) {
+        isEligible = false;
+        reasons.push(`월소득 기준(${maxRatio}% 이하: 월 ${maxAllowedIncome}만원) 초과 (현재 월 ${state.monthlyIncome}만원)`);
+      } else {
+        reasons.push(`소득 요건 충족 (월 ${state.monthlyIncome}만원 ≤ 기준 ${maxAllowedIncome}만원)`);
+      }
+    } else {
+      reasons.push("소득 제한 없음 (일반 공급 기준)");
+    }
+
+    // 4. 자동차 요건 검사
+    if (type.requireCarCheck) {
+      if (state.carStatus === "over-limit") {
+        isEligible = false;
+        reasons.push("자동차가액 기준(약 3,708만원 이하) 초과");
+      } else if (type.id === "youth-purchase" && state.carStatus !== "none") {
+        isWarning = true;
+        reasons.push("청년 매입임대는 원칙적으로 차량 미보유자 우선 (생업용 차량 증명 필요)");
+      }
+    }
+
+    // 5. 자산 요건 검사
+    if (type.assetLimitType === "youth") {
+      if (state.totalAssetStatus === "over-general" || state.totalAssetStatus === "under-general") {
+        if (state.totalAssetStatus === "under-general") {
+          isWarning = true;
+          reasons.push("청년 총자산 기준(2.73억 이하) 확인 필요");
+        } else {
+          isEligible = false;
+          reasons.push("청년 총자산 기준(2억 7,300만원 이하) 초과");
+        }
+      }
+    } else if (type.assetLimitType === "general") {
+      if (state.totalAssetStatus === "over-general") {
+        isEligible = false;
+        reasons.push("총자산 기준(3억 4,500만원 이하) 초과");
+      }
+    }
+
+    // 6. 지역 순위 요건 검사 (서울 전용 등)
+    if (type.id === "seoul-youth-safe" || type.id === "longterm-jeonse") {
+      if (state.targetSido !== "서울특별시") {
+        isEligible = false;
+        reasons.push("서울특별시 관내에서만 공급되는 전용 주택입니다.");
+      }
+    }
+
+    return {
+      ...type,
+      isEligible,
+      isWarning,
+      reasons,
+      regionalRank: regionEval.rankText,
+      regionalBadge: regionEval.badgeColor
+    };
+  });
+}
+
+/**
+ * 주택 유형 카드 목록 렌더링
+ */
+function renderHousingCards() {
+  const container = document.getElementById("housing-results-container");
+  if (!container) return;
+  container.innerHTML = "";
+
+  let listToRender = calculatedHousingList;
+
+  if (state.currentTab === "eligible") {
+    listToRender = calculatedHousingList.filter(h => h.isEligible);
+  }
+
+  if (listToRender.length === 0) {
+    container.innerHTML = `
+      <div class="col-span-full py-12 text-center bg-white rounded-2xl border border-dashed border-slate-300 p-8">
+        <div class="text-4xl mb-3">🔍</div>
+        <h4 class="text-lg font-bold text-slate-800 mb-1">조건에 부합하는 주택 유형이 없습니다</h4>
+        <p class="text-sm text-slate-600">소득 또는 가구원수, 자산 조건을 조정하거나 '전체 보기' 탭을 확인해보세요.</p>
+      </div>
+    `;
+    return;
+  }
+
+  listToRender.forEach((housing) => {
+    const card = document.createElement("div");
+    card.className = `bg-white rounded-2xl border transition-all duration-200 overflow-hidden shadow-sm hover:shadow-md flex flex-col justify-between ${
+      housing.isEligible 
+        ? "border-blue-200 hover:border-blue-400" 
+        : "border-slate-200 opacity-80 hover:opacity-100"
+    }`;
+
+    // 상태 뱃지
+    let statusBadge = "";
+    if (housing.isEligible) {
+      if (housing.isWarning) {
+        statusBadge = `<span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-300">조건부 신청가능</span>`;
+      } else {
+        statusBadge = `<span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-300">✓ 신청 자격 충족</span>`;
+      }
+    } else {
+      statusBadge = `<span class="bg-rose-100 text-rose-700 text-xs font-bold px-2.5 py-1 rounded-full border border-rose-300">신청 불가 (요건 확인)</span>`;
+    }
+
+    const featureListHtml = housing.features.map(f => `
+      <li class="flex items-start gap-1.5 text-xs text-slate-600">
+        <span class="text-blue-500 font-bold">•</span>
+        <span>${f}</span>
+      </li>
+    `).join("");
+
+    const reasonsHtml = housing.reasons.map(r => `
+      <li class="text-xs ${r.includes('초과') || r.includes('미충족') || r.includes('아닙니다') ? 'text-rose-600 font-medium' : 'text-slate-600'}">
+        ${r.includes('초과') || r.includes('미충족') ? '✕ ' : '✓ '} ${r}
+      </li>
+    `).join("");
+
+    card.innerHTML = `
+      <div class="p-5">
+        <div class="flex items-start justify-between gap-2 mb-2.5">
+          <h4 class="text-base font-bold text-slate-900">${housing.name}</h4>
+          ${statusBadge}
+        </div>
+        <p class="text-xs text-slate-500 mb-3 leading-relaxed">${housing.description}</p>
+        
+        <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-3.5 space-y-1.5">
+          <div class="flex justify-between text-xs">
+            <span class="text-slate-500">예상 임대료:</span>
+            <span class="font-bold text-slate-800">${housing.rentRate}</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="text-slate-500">최대 거주 기간:</span>
+            <span class="font-bold text-slate-800">${housing.stayPeriod}</span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="text-slate-500">희망지역 신청 순위:</span>
+            <span class="font-bold text-blue-700">${housing.regionalRank}</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <span class="text-xs font-bold text-slate-700 block mb-1">핵심 특징:</span>
+          <ul class="space-y-1">${featureListHtml}</ul>
+        </div>
+
+        <div class="border-t border-slate-100 pt-3">
+          <span class="text-xs font-bold text-slate-700 block mb-1">내 조건 진단 결과:</span>
+          <ul class="space-y-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200">${reasonsHtml}</ul>
+        </div>
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+        <div class="text-xs text-slate-500">
+          신청처: <span class="font-semibold text-slate-700">${housing.officialSites.slice(0, 2).join(", ")}</span>
+        </div>
+        <a href="#official-platforms-section" class="text-xs font-semibold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1">
+          공고 보러가기 →
+        </a>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+/**
+ * 공식 청약 사이트 바로가기 버튼 동적 업데이트
+ */
+function updateOfficialSiteLinks() {
+  if (typeof OFFICIAL_PLATFORMS === 'undefined') return;
+  const container = document.getElementById("official-platforms-grid");
+  if (!container) return;
+  container.innerHTML = "";
+
+  OFFICIAL_PLATFORMS.forEach((platform) => {
+    let isRecommended = false;
+    if (platform.id === "sh" && state.targetSido === "서울특별시") isRecommended = true;
+    if (platform.id === "gh" && state.targetSido === "경기도") isRecommended = true;
+    if (platform.id === "lh" || platform.id === "myhome") isRecommended = true;
+
+    const card = document.createElement("div");
+    card.className = `bg-white rounded-2xl border p-5 transition-all shadow-sm hover:shadow-md flex flex-col justify-between ${
+      isRecommended ? "border-blue-300 ring-1 ring-blue-100" : "border-slate-200"
+    }`;
+
+    card.innerHTML = `
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold px-2 py-0.5 rounded-full ${isRecommended ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'}">
+            ${platform.badge}
+          </span>
+          ${isRecommended ? '<span class="text-xs font-bold text-emerald-600">★ 현재 지역 추천</span>' : ''}
+        </div>
+        <h4 class="font-bold text-base text-slate-900 mb-1">${platform.name}</h4>
+        <p class="text-xs text-blue-600 font-medium mb-2">${platform.tagline}</p>
+        <p class="text-xs text-slate-600 leading-relaxed mb-4">${platform.features}</p>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2">
+        <a href="${platform.noticeUrl}" target="_blank" rel="noopener noreferrer" 
+           class="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs py-2.5 px-3 rounded-xl transition shadow-sm inline-flex items-center justify-center gap-1">
+          <span>실시간 공고 검색</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+        <a href="${platform.url}" target="_blank" rel="noopener noreferrer" 
+           class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs py-2.5 px-3 rounded-xl transition text-center inline-flex items-center justify-center">
+          홈페이지
+        </a>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+/**
+ * 모의 실시간 공고 매칭 렌더링 (최신 날짜 기준 필터링 지원)
+ */
+function renderMatchingAnnouncements(regionEval) {
+  const container = document.getElementById("matching-announcements-list");
+  const countBadgeEl = document.getElementById("matching-count-badge");
+  if (!container) return;
+  container.innerHTML = "";
+
+  // 동적 날짜 기준 공고 획득
+  const allAnnouncements = typeof getDynamicAnnouncements === 'function' 
+    ? getDynamicAnnouncements(state.baseDate) 
+    : (typeof MOCK_ANNOUNCEMENTS !== 'undefined' ? MOCK_ANNOUNCEMENTS : []);
+
+  // 1. 신청 가능 필터링 (사용자 요청: 항상 최신날짜 기준으로 신청 가능한 곳만)
+  let filtered = allAnnouncements.filter(a => {
+    if (state.onlyApplyable) {
+      return a.isApplyable === true; // 접수중 또는 접수예정만
+    }
+    return true;
+  });
+
+  // 2. 희망 지역 일치 공고 우선 정렬 (상단 배치)
+  filtered.sort((a, b) => {
+    const aTarget = (a.sido === state.targetSido) ? 1 : 0;
+    const bTarget = (b.sido === state.targetSido) ? 1 : 0;
+    if (bTarget !== aTarget) return bTarget - aTarget;
+    // 접수중 우선 정렬
+    if (a.status === "접수중" && b.status !== "접수중") return -1;
+    if (b.status === "접수중" && a.status !== "접수중") return 1;
+    return 0;
+  });
+
+  if (countBadgeEl) {
+    countBadgeEl.textContent = `총 ${filtered.length}건`;
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="p-8 text-center text-slate-500 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+        <p class="font-bold text-slate-700 mb-1">현재 신청 가능한 공고가 없습니다.</p>
+        <p class="text-xs text-slate-500">'마감된 공고 포함'을 체크하거나 공식 사이트 바로가기에서 실시간 공고를 확인해 보세요.</p>
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach((anc) => {
+    const isTargetRegion = (anc.sido === state.targetSido);
+    const item = document.createElement("div");
+    item.className = `p-4 sm:p-5 rounded-2xl border bg-white transition hover:border-blue-300 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+      isTargetRegion ? "border-blue-300 bg-blue-50/30 ring-1 ring-blue-100" : "border-slate-200"
+    }`;
+
+    item.innerHTML = `
+      <div class="space-y-1.5 flex-1">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-bold px-2 py-0.5 rounded border ${anc.statusBadge}">${anc.status}</span>
+          <span class="text-xs font-black px-2 py-0.5 rounded bg-blue-600 text-white">${anc.dDayText}</span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">${anc.agency}</span>
+          <span class="text-xs font-medium px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-100">${anc.housingType}</span>
+          ${isTargetRegion ? '<span class="text-xs font-extrabold text-blue-700 bg-yellow-100 px-2 py-0.5 rounded border border-yellow-300">★ 선택 희망지역</span>' : ''}
+        </div>
+        <h5 class="font-bold text-slate-900 text-base sm:text-lg">${anc.title}</h5>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+          <span>📍 <strong>${anc.sido} ${anc.gugun}</strong></span>
+          <span>📅 <strong>접수기간:</strong> ${anc.period}</span>
+          <span>🏢 ${anc.scale}</span>
+          <span>💰 <strong>조건:</strong> ${anc.deposit} / ${anc.monthlyRent}</span>
+        </div>
+      </div>
+      <div class="shrink-0 flex items-center gap-2">
+        <a href="${anc.link}" target="_blank" rel="noopener noreferrer" 
+           class="w-full md:w-auto text-center px-4 py-2.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition shadow-sm inline-flex items-center justify-center gap-1.5">
+          <span>신청 공고문 확인</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+      </div>
+    `;
+
+    container.appendChild(item);
+  });
+}
+
+  </script>
+</body>
+</html>
