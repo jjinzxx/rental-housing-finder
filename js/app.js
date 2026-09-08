@@ -23,11 +23,17 @@ const state = {
   // 탭 및 날짜 필터 상태
   currentTab: "all", // all, eligible
   onlyApplyable: true, // 항상 최신 날짜 기준 신청 가능한 곳만 보기 (기본값 TRUE)
-  baseDate: new Date()
+  baseDate: new Date(),
+
+  // 공공데이터포털 실시간 연동 상태
+  realAnnouncements: null,
+  lastUpdatedText: "매일 자정 자동 갱신",
+  dataSource: "공공데이터포털(data.go.kr) 실시간 파이프라인"
 };
 
 // 각 주택 유형에 대한 진단 결과 보관용 변수 (상단 선언으로 TDZ 에러 방지)
 let calculatedHousingList = [];
+
 
 
 /**
@@ -42,7 +48,54 @@ function startApplication() {
   setupEventListeners();
   updateIncomeStandardDisplay();
   calculateAndRender();
+
+  // 공공데이터포털 실시간 JSON 비동기 로드
+  loadRealAnnouncements();
 }
+
+/**
+ * data/real-announcements.json 비동기 로딩 및 상태 갱신
+ */
+async function loadRealAnnouncements() {
+  try {
+    const res = await fetch('data/real-announcements.json');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.items) && data.items.length > 0) {
+        state.realAnnouncements = data.items;
+        state.lastUpdatedText = data.lastUpdatedText || "최근 갱신됨";
+        state.dataSource = data.source || "공공데이터포털(data.go.kr)";
+        
+        // 상태 뱃지 업데이트
+        updateApiStatusDisplay(data.lastUpdatedText, data.source);
+
+        // 공고 목록 다시 렌더링
+        const regionEval = evaluateRegionalPriority(
+          state.userSido, state.userGugun, state.workSido, state.workGugun, state.targetSido, state.targetGugun
+        );
+        renderMatchingAnnouncements(regionEval);
+        console.log('✅ 공공데이터포털 최신 공고 데이터를 성공적으로 로드했습니다.');
+      }
+    }
+  } catch (err) {
+    console.log('ℹ️ 로컬/정적 모드로 공고 템플릿 엔진을 사용합니다.');
+  }
+}
+
+/**
+ * 실시간 API 동기화 상태 뱃지 표시
+ */
+function updateApiStatusDisplay(lastUpdated, source) {
+  const badgeEl = document.getElementById("api-sync-badge");
+  if (!badgeEl) return;
+  badgeEl.innerHTML = `
+    <span class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-1 rounded-full text-xs font-semibold">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+      <span>자동 갱신: ${lastUpdated}</span>
+    </span>
+  `;
+}
+
 
 if (document.readyState === 'loading') {
   document.addEventListener("DOMContentLoaded", startApplication);
@@ -668,7 +721,7 @@ function updateOfficialSiteLinks() {
 }
 
 /**
- * 모의 실시간 공고 매칭 렌더링 (최신 날짜 기준 필터링 지원)
+ * 실시간 공고 매칭 렌더링 (공공데이터포털 연동 데이터 우선 및 최신 날짜 D-Day 판정)
  */
 function renderMatchingAnnouncements(regionEval) {
   const container = document.getElementById("matching-announcements-list");
@@ -676,25 +729,80 @@ function renderMatchingAnnouncements(regionEval) {
   if (!container) return;
   container.innerHTML = "";
 
-  // 동적 날짜 기준 공고 획득
-  const allAnnouncements = typeof getDynamicAnnouncements === 'function' 
-    ? getDynamicAnnouncements(state.baseDate) 
-    : (typeof MOCK_ANNOUNCEMENTS !== 'undefined' ? MOCK_ANNOUNCEMENTS : []);
+  // 1. 공공데이터포털 실시간 데이터가 있으면 사용, 없으면 동적 템플릿 사용
+  let sourceList = state.realAnnouncements;
+  if (!sourceList || sourceList.length === 0) {
+    sourceList = typeof getDynamicAnnouncements === 'function' 
+      ? getDynamicAnnouncements(state.baseDate) 
+      : (typeof MOCK_ANNOUNCEMENTS !== 'undefined' ? MOCK_ANNOUNCEMENTS : []);
+  }
 
-  // 1. 신청 가능 필터링 (사용자 요청: 항상 최신날짜 기준으로 신청 가능한 곳만)
-  let filtered = allAnnouncements.filter(a => {
+  const now = state.baseDate || new Date();
+  const nowTime = now.getTime();
+
+  // 각 공고에 대해 오늘 날짜 기준 실시간 D-Day 및 접수 상태 재계산
+  const computedList = sourceList.map((anc) => {
+    let startDate = null;
+    let endDate = null;
+
+    if (anc.startDateStr && anc.endDateStr) {
+      const sp = anc.startDateStr.split('.');
+      const ep = anc.endDateStr.split('.');
+      if (sp.length === 3) startDate = new Date(parseInt(sp[0]), parseInt(sp[1]) - 1, parseInt(sp[2]));
+      if (ep.length === 3) endDate = new Date(parseInt(ep[0]), parseInt(ep[1]) - 1, parseInt(ep[2]), 23, 59, 59);
+    }
+
+    if (!startDate || !endDate) {
+      return anc;
+    }
+
+    const startTime = startDate.getTime();
+    const endTime = endDate.getTime();
+
+    let status = "접수중";
+    let statusBadge = "bg-emerald-100 text-emerald-800 border-emerald-300";
+    let isApplyable = true;
+    let dDayText = "";
+
+    if (nowTime < startTime) {
+      status = "접수예정";
+      statusBadge = "bg-amber-100 text-amber-800 border-amber-300";
+      const diffDays = Math.ceil((startTime - nowTime) / (1000 * 60 * 60 * 24));
+      dDayText = `D-${diffDays}일 후 시작`;
+    } else if (nowTime > endTime) {
+      status = "마감됨";
+      statusBadge = "bg-slate-100 text-slate-500 border-slate-300";
+      isApplyable = false;
+      dDayText = "접수종료";
+    } else {
+      status = "접수중";
+      statusBadge = "bg-emerald-100 text-emerald-800 border-emerald-300";
+      const remainDays = Math.ceil((endTime - nowTime) / (1000 * 60 * 60 * 24));
+      dDayText = remainDays <= 3 ? `🔥 D-${remainDays}일 (마감임박)` : `D-${remainDays}일 남음`;
+    }
+
+    return {
+      ...anc,
+      status,
+      statusBadge,
+      isApplyable,
+      dDayText
+    };
+  });
+
+  // 2. 신청 가능 필터링 (항상 최신날짜 기준 신청 가능한 곳만)
+  let filtered = computedList.filter(a => {
     if (state.onlyApplyable) {
-      return a.isApplyable === true; // 접수중 또는 접수예정만
+      return a.isApplyable === true;
     }
     return true;
   });
 
-  // 2. 희망 지역 일치 공고 우선 정렬 (상단 배치)
+  // 3. 희망 지역 일치 공고 우선 정렬
   filtered.sort((a, b) => {
     const aTarget = (a.sido === state.targetSido) ? 1 : 0;
     const bTarget = (b.sido === state.targetSido) ? 1 : 0;
     if (bTarget !== aTarget) return bTarget - aTarget;
-    // 접수중 우선 정렬
     if (a.status === "접수중" && b.status !== "접수중") return -1;
     if (b.status === "접수중" && a.status !== "접수중") return 1;
     return 0;
@@ -703,6 +811,7 @@ function renderMatchingAnnouncements(regionEval) {
   if (countBadgeEl) {
     countBadgeEl.textContent = `총 ${filtered.length}건`;
   }
+
 
   if (filtered.length === 0) {
     container.innerHTML = `

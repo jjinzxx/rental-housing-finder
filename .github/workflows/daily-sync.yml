@@ -1,0 +1,43 @@
+name: Daily Public Housing Announcement Sync (매일 공고 자동 갱신)
+
+on:
+  schedule:
+    # 매일 한국 시간(KST) 00:00 (자정)에 실행 (UTC 15:00)
+    - cron: '0 15 * * *'
+  workflow_dispatch: # GitHub 웹 UI에서 언제든 'Run workflow' 버튼으로 즉시 수동 실행 가능
+
+jobs:
+  sync-announcements:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 갱신된 JSON 커밋 및 푸시 권한
+
+    steps:
+      - name: 📥 코드 저장소 체크아웃
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Node.js 환경 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 🔄 공공데이터포털 실시간 공고 수집 및 갱신 실행
+        env:
+          DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}
+        run: |
+          node scripts/sync-announcements.js
+
+      - name: 🚀 변경된 최신 공고 데이터 자동 커밋 및 푸시
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 변경사항 확인
+          if git status --porcelain | grep -q 'data/real-announcements.json'; then
+            echo "✅ 최신 공고 데이터 변경사항이 감지되어 커밋 및 푸시를 진행합니다."
+            git add data/real-announcements.json
+            git commit -m "chore(data): 공공데이터포털 실시간 공고 자동 갱신 [skip ci]"
+            git push origin main
+          else
+            echo "ℹ️ 변경된 공고 데이터가 없습니다."
+          fi
